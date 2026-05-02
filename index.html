@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saint of the Day</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #0F0A1E;
+            font-family: 'Lato', sans-serif;
+            color: #E8D5A3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: #1A0F2E;
+            border-radius: 16px;
+            padding: 36px 40px;
+            max-width: 780px;
+            width: 100%;
+            border: 1px solid #2A1845;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2A1845;
+        }
+
+        .nav a {
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #9B7FBF;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover { color: #C9A84C; }
+        .nav a.active { color: #C9A84C; border-bottom: 1px solid #C9A84C; padding-bottom: 2px; }
+
+        .date {
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            color: #9B7FBF;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            color: #C9A84C;
+            text-align: center;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .divider {
+            text-align: center;
+            color: #C9A84C;
+            font-size: 14px;
+            letter-spacing: 0.4em;
+            margin-bottom: 20px;
+        }
+
+        .discover-btn {
+            display: block;
+            margin: 0 auto 24px;
+            background: transparent;
+            border: 1px solid #C9A84C;
+            color: #C9A84C;
+            font-family: 'Lato', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            padding: 9px 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .discover-btn:hover { background: #2A1845; }
+        .discover-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .feast-date {
+            text-align: center;
+            color: #9B7FBF;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            min-height: 18px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .saint-card {
+            background: #2A1845;
+            border: 1px solid #4A3060;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .saint-card img {
+            width: 100%;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .cross-placeholder {
+            font-size: 56px;
+            color: #C9A84C;
+            padding: 28px 0;
+        }
+
+        .saint-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: #E8D5A3;
+            margin: 12px 0 4px;
+            line-height: 1.4;
+        }
+
+        .feast-type {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: #9B7FBF;
+            text-transform: uppercase;
+        }
+
+        .season-box {
+            background: #2A1845;
+            border: 1px solid #4A3060;
+            border-radius: 6px;
+            padding: 10px 14px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .season-label {
+            font-size: 10px;
+            color: #9B7FBF;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .season-value { font-size: 13px; color: #C9A84C; }
+
+        .right-col { display: flex; flex-direction: column; gap: 14px; }
+
+        .quote-box {
+            background: #2A1845;
+            border-left: 3px solid #C9A84C;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+        }
+
+        .about-box {
+            background: #2A1845;
+            border: 1px solid #4A3060;
+            border-radius: 8px;
+            padding: 14px 18px;
+        }
+
+        .box-label {
+            font-size: 10px;
+            color: #9B7FBF;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: #E8D5A3;
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+        .about-text { font-size: 13px; color: #C5B08A; line-height: 1.85; }
+        .no-data { font-size: 13px; color: #5A4070; font-style: italic; }
+
+        .wiki-link { text-align: right; font-size: 11px; }
+        .wiki-link a { color: #9B7FBF; letter-spacing: 0.08em; text-decoration: none; transition: color 0.2s; }
+        .wiki-link a:hover { color: #C9A84C; }
+
+        .credit {
+            text-align: center;
+            font-size: 10px;
+            color: #3D2A5A;
+            letter-spacing: 0.1em;
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 1px solid #2A1845;
+        }
+
+        .loading {
+            text-align: center;
+            color: #9B7FBF;
+            font-size: 13px;
+            padding: 40px 0;
+            letter-spacing: 0.1em;
+        }
+
+        @media (max-width: 580px) {
+            .two-col { grid-template-columns: 1fr; }
+            .card { padding: 24px 20px; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="index.html" class="active">Saint of the Day</a>
+        <a href="search.html">Search by Patronage</a>
+    </nav>
+
+    <p class="date" id="date-display"></p>
+    <h1>Saint of the Day</h1>
+    <div class="divider">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <button class="discover-btn" id="discover-btn" onclick="discoverSaint()">✦ Discover Another Saint</button>
+    <p class="feast-date" id="feast-date"></p>
+    <div id="content"><div class="loading">Loading today's saint...</div></div>
+    <div class="credit">Data provided by Catholic Readings API · cpbjr.github.io/catholic-readings-api</div>
+</div>
+
+<script>
+    const SAINT_TYPES = ['MEMORIAL', 'FEAST', 'SOLEMNITY', 'OPTIONAL_MEMORIAL'];
+
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return { year, month, day };
+    }
+
+    async function fetchSaint(date) {
+        const { year, month, day } = formatDate(date);
+        const url = `https://cpbjr.github.io/catholic-readings-api/liturgical-calendar/${year}/${month}-${day}.json`;
+        try {
+            const res = await fetch(url);
+            if (!res.ok) return null;
+            const data = await res.json();
+            const type = data?.celebration?.type || '';
+            const name = data?.celebration?.name || '';
+            if (name && SAINT_TYPES.includes(type)) return { data, date };
+            return null;
+        } catch { return null; }
+    }
+
+    async function getTodaySaint() {
+        const today = new Date();
+        for (let i = 0; i < 7; i++) {
+            const checkDate = new Date(today);
+            checkDate.setDate(today.getDate() + i);
+            const result = await fetchSaint(checkDate);
+            if (result) return result;
+        }
+        return null;
+    }
+
+    async function getRandomSaint() {
+        const today = new Date();
+        for (let i = 0; i < 100; i++) {
+            const randomDays = Math.floor(Math.random() * 364) + 1;
+            const randomDate = new Date(today);
+            randomDate.setDate(today.getDate() + randomDays);
+            const result = await fetchSaint(randomDate);
+            if (result) return result;
+        }
+        return null;
+    }
+
+    function renderSaint({ data, date }) {
+        const today = new Date();
+        const isToday = date.toDateString() === today.toDateString();
+        const feastDateEl = document.getElementById('feast-date');
+        feastDateEl.textContent = !isToday
+            ? `Feast Day: ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`
+            : '';
+
+        const c = data.celebration;
+        const name = c.name || '';
+        const feastType = (c.type || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const quote = c.quote || '';
+        const description = c.description || '';
+        const image = c.image || '';
+        const season = (data.season || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const wiki = data.wikipediaLink || '';
+
+        const imageHTML = image
+            ? `<img src="${image}" alt="${name}" onerror="this.outerHTML='<div class=\\'cross-placeholder\\'>✝</div>'">`
+            : `<div class="cross-placeholder">✝</div>`;
+
+        const seasonHTML = season ? `
+            <div class="season-box">
+                <div class="season-label">Liturgical Season</div>
+                <div class="season-value">${season}</div>
+            </div>` : '';
+
+        const quoteHTML = quote
+            ? `<div class="quote-box"><div class="box-label">Quote</div><div class="quote-text">"${quote}"</div></div>`
+            : `<div class="quote-box"><div class="box-label">Quote</div><div class="no-data">No quote available :( Check back another time.</div></div>`;
+
+        const aboutHTML = description
+            ? `<div class="about-box"><div class="box-label">About</div><div class="about-text">${description}</div></div>`
+            : `<div class="about-box"><div class="box-label">About</div><div class="no-data">No description available :( Check back another time.</div></div>`;
+
+        const wikiHTML = wiki
+            ? `<div class="wiki-link"><a href="${wiki}" target="_blank">Read more on Wikipedia →</a></div>`
+            : '';
+
+        document.getElementById('content').innerHTML = `
+            <div class="two-col">
+                <div>
+                    <div class="saint-card">
+                        ${imageHTML}
+                        <div class="saint-name">${name}</div>
+                        <div class="feast-type">${feastType}</div>
+                    </div>
+                    ${seasonHTML}
+                </div>
+                <div class="right-col">
+                    ${quoteHTML}
+                    ${aboutHTML}
+                    ${wikiHTML}
+                </div>
+            </div>`;
+    }
+
+    async function discoverSaint() {
+        const btn = document.getElementById('discover-btn');
+        btn.disabled = true;
+        btn.textContent = 'Finding a saint...';
+        document.getElementById('content').innerHTML = '<div class="loading">Finding a saint...</div>';
+        document.getElementById('feast-date').textContent = '';
+        const result = await getRandomSaint();
+        if (result) renderSaint(result);
+        else document.getElementById('content').innerHTML = '<div class="loading">Could not find a saint. Please try again.</div>';
+        btn.disabled = false;
+        btn.textContent = '✦ Discover Another Saint';
+    }
+
+    (async function init() {
+        const today = new Date();
+        document.getElementById('date-display').textContent =
+            today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+        const result = await getTodaySaint();
+        if (result) renderSaint(result);
+        else document.getElementById('content').innerHTML = '<div class="loading">No saint found for today. Try discovering another!</div>';
+    })();
+</script>
+</body>
+</html>
