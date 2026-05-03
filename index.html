@@ -230,7 +230,6 @@
 </head>
 <body>
 <div class="card">
-    <!-- Navigation -->
     <nav class="nav">
         <a href="index.html" class="active">Saint of the Day</a>
         <a href="search.html">Search by Patronage</a>
@@ -246,8 +245,21 @@
 </div>
 
 <script>
+    // ── Valid feast types ─────────────────────────────────────────────────────
     const SAINT_TYPES = ['MEMORIAL', 'FEAST', 'OPTIONAL_MEMORIAL'];
 
+    // ── Name prefixes that indicate an actual saint ───────────────────────────
+    // Excludes generic feasts like "Chair of Peter" or "Triumph of the Cross"
+    const SAINT_PREFIXES = ['st.', 'saint', 'blessed', 'our lady', 'mary', 'virgin', 'bl.'];
+
+    // Check if the celebration name refers to an actual saint
+    function isSaint(name) {
+        if (!name) return false;
+        const lower = name.toLowerCase();
+        return SAINT_PREFIXES.some(prefix => lower.startsWith(prefix) || lower.includes(prefix));
+    }
+
+    // Format date for API URL
     function formatDate(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -255,6 +267,7 @@
         return { year, month, day };
     }
 
+    // Fetch and validate a saint from the API
     async function fetchSaint(date) {
         const { year, month, day } = formatDate(date);
         const url = `https://cpbjr.github.io/catholic-readings-api/liturgical-calendar/${year}/${month}-${day}.json`;
@@ -264,11 +277,13 @@
             const data = await res.json();
             const type = data?.celebration?.type || '';
             const name = data?.celebration?.name || '';
-            if (name && SAINT_TYPES.includes(type)) return { data, date };
+            // Must be valid feast type AND a real saint name
+            if (SAINT_TYPES.includes(type) && isSaint(name)) return { data, date };
             return null;
         } catch { return null; }
     }
 
+    // Try today first, then look ahead up to 7 days for the nearest saint
     async function getTodaySaint() {
         const today = new Date();
         for (let i = 0; i < 7; i++) {
@@ -280,6 +295,7 @@
         return null;
     }
 
+    // Pick random future dates until we find a valid saint
     async function getRandomSaint() {
         const today = new Date();
         for (let i = 0; i < 100; i++) {
@@ -292,9 +308,11 @@
         return null;
     }
 
+    // Build and inject saint HTML into the page
     function renderSaint({ data, date }) {
         const today = new Date();
         const isToday = date.toDateString() === today.toDateString();
+
         const feastDateEl = document.getElementById('feast-date');
         feastDateEl.textContent = !isToday
             ? `Feast Day: ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`
@@ -309,6 +327,7 @@
         const season = (data.season || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         const wiki = data.wikipediaLink || '';
 
+        // Image or cross placeholder — onerror swaps broken images for the cross
         const imageHTML = image
             ? `<img src="${image}" alt="${name}" onerror="this.outerHTML='<div class=\\'cross-placeholder\\'>✝</div>'">`
             : `<div class="cross-placeholder">✝</div>`;
@@ -349,6 +368,7 @@
             </div>`;
     }
 
+    // Discover button — find a random valid saint and render it
     async function discoverSaint() {
         const btn = document.getElementById('discover-btn');
         btn.disabled = true;
@@ -362,6 +382,7 @@
         btn.textContent = '✦ Discover Another Saint';
     }
 
+    // On page load — set date and load today's saint
     (async function init() {
         const today = new Date();
         document.getElementById('date-display').textContent =

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saint Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #0F0A1E;
+            font-family: 'Lato', sans-serif;
+            color: #E8D5A3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: #1A0F2E;
+            border-radius: 16px;
+            padding: 36px 40px;
+            max-width: 780px;
+            width: 100%;
+            border: 1px solid #2A1845;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2A1845;
+        }
+
+        .nav a {
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #9B7FBF;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover { color: #C9A84C; }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-block;
+            font-size: 11px;
+            color: #9B7FBF;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #C9A84C; }
+
+        .divider {
+            text-align: center;
+            color: #C9A84C;
+            font-size: 14px;
+            letter-spacing: 0.4em;
+            margin-bottom: 24px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* ── Left saint image card ── */
+        .saint-card {
+            background: #2A1845;
+            border: 1px solid #4A3060;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .saint-card img {
+            width: 100%;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .cross-placeholder {
+            font-size: 56px;
+            color: #C9A84C;
+            padding: 28px 0;
+        }
+
+        .saint-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: #E8D5A3;
+            margin: 12px 0 4px;
+            line-height: 1.4;
+        }
+
+        /* ── Patronage tags on left card ── */
+        .patronage-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background: #1A0F2E;
+            border: 1px solid #4A3060;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 10px;
+            color: #9B7FBF;
+            letter-spacing: 0.08em;
+        }
+
+        .right-col { display: flex; flex-direction: column; gap: 14px; }
+
+        .quote-box {
+            background: #2A1845;
+            border-left: 3px solid #C9A84C;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+        }
+
+        .about-box {
+            background: #2A1845;
+            border: 1px solid #4A3060;
+            border-radius: 8px;
+            padding: 14px 18px;
+        }
+
+        .box-label {
+            font-size: 10px;
+            color: #9B7FBF;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: #E8D5A3;
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+        .about-text { font-size: 13px; color: #C5B08A; line-height: 1.85; }
+        .no-data { font-size: 13px; color: #5A4070; font-style: italic; }
+
+        .wiki-link { text-align: right; font-size: 11px; }
+        .wiki-link a { color: #9B7FBF; letter-spacing: 0.08em; text-decoration: none; transition: color 0.2s; }
+        .wiki-link a:hover { color: #C9A84C; }
+
+        .credit {
+            text-align: center;
+            font-size: 10px;
+            color: #3D2A5A;
+            letter-spacing: 0.1em;
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 1px solid #2A1845;
+        }
+
+        .not-found {
+            text-align: center;
+            color: #5A4070;
+            font-size: 13px;
+            font-style: italic;
+            padding: 40px 0;
+        }
+
+        @media (max-width: 580px) {
+            .two-col { grid-template-columns: 1fr; }
+            .card { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <nav class="nav">
+        <a href="index.html">Saint of the Day</a>
+        <a href="search.html">Search by Patronage</a>
+    </nav>
+
+    <a class="back-link" href="search.html">← Back to Search</a>
+    <div class="divider">✦ &nbsp; ✦ &nbsp; ✦</div>
+
+    <div id="content"><div class="not-found">Loading...</div></div>
+
+    <div class="credit">Data compiled from Catholic tradition</div>
+</div>
+
+<!-- Load shared saints dataset -->
+<script src="saints-data.js"></script>
+
+<script>
+    // Read the saint ID from the URL query string
+    const params = new URLSearchParams(window.location.search);
+    const saintId = params.get('id');
+
+    // Find the saint in our dataset
+    const saint = SAINTS_DATA.find(s => s.id === saintId);
+
+    if (!saint) {
+        // Saint not found — show error
+        document.getElementById('content').innerHTML = `
+            <div class="not-found">Saint not found. <a href="search.html" style="color:#C9A84C;">Go back to search.</a></div>`;
+    } else {
+        // Update page title
+        document.title = saint.name;
+
+        // Image or cross placeholder
+        const imageHTML = saint.image
+            ? `<img src="${saint.image}" alt="${saint.name}" onerror="this.outerHTML='<div class=\\'cross-placeholder\\'>✝</div>'">`
+            : `<div class="cross-placeholder">✝</div>`;
+
+        // Patronage tags
+        const tagsHTML = saint.patronages.map(p => `<span class="tag">${p}</span>`).join('');
+
+        // Quote
+        const quoteHTML = saint.quote
+            ? `<div class="quote-box"><div class="box-label">Quote</div><div class="quote-text">"${saint.quote}"</div></div>`
+            : `<div class="quote-box"><div class="box-label">Quote</div><div class="no-data">No quote available :( Check back another time.</div></div>`;
+
+        // About
+        const aboutHTML = saint.description
+            ? `<div class="about-box"><div class="box-label">About</div><div class="about-text">${saint.description}</div></div>`
+            : `<div class="about-box"><div class="box-label">About</div><div class="no-data">No description available :( Check back another time.</div></div>`;
+
+        // Wikipedia link
+        const wikiHTML = saint.wiki
+            ? `<div class="wiki-link"><a href="${saint.wiki}" target="_blank">Read more on Wikipedia →</a></div>`
+            : '';
+
+        document.getElementById('content').innerHTML = `
+            <div class="two-col">
+                <div>
+                    <div class="saint-card">
+                        ${imageHTML}
+                        <div class="saint-name">${saint.name}</div>
+                        <div class="patronage-tags">${tagsHTML}</div>
+                    </div>
+                </div>
+                <div class="right-col">
+                    ${quoteHTML}
+                    ${aboutHTML}
+                    ${wikiHTML}
+                </div>
+            </div>`;
+    }
+</script>
+</body>
+</html>

@@ -50,7 +50,6 @@
         .nav a:hover { color: #C9A84C; }
         .nav a.active { color: #C9A84C; border-bottom: 1px solid #C9A84C; padding-bottom: 2px; }
 
-        /* ── Header ── */
         h1 {
             font-family: 'Playfair Display', serif;
             font-size: 2.4rem;
@@ -69,11 +68,6 @@
         }
 
         /* ── Search input ── */
-        .search-wrap {
-            position: relative;
-            margin-bottom: 8px;
-        }
-
         .search-input {
             width: 100%;
             background: #2A1845;
@@ -85,12 +79,12 @@
             color: #E8D5A3;
             outline: none;
             transition: border-color 0.2s;
+            margin-bottom: 8px;
         }
 
         .search-input::placeholder { color: #5A4070; }
         .search-input:focus { border-color: #C9A84C; }
 
-        /* ── Result count ── */
         .result-count {
             font-size: 11px;
             color: #5A4070;
@@ -100,15 +94,24 @@
             min-height: 16px;
         }
 
-        /* ── Results grid ── */
         .results { display: flex; flex-direction: column; gap: 12px; }
 
-        /* ── Single result card ── */
+        /* ── Clickable result card ── */
         .result-card {
             background: #2A1845;
             border: 1px solid #4A3060;
             border-radius: 10px;
             padding: 16px 20px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+
+        .result-card:hover {
+            border-color: #C9A84C;
+            background: #321A55;
         }
 
         .result-header {
@@ -148,7 +151,6 @@
             margin-bottom: 4px;
         }
 
-        /* ── Patronage tags ── */
         .patronage-tags {
             display: flex;
             flex-wrap: wrap;
@@ -177,7 +179,15 @@
             line-height: 1.7;
         }
 
-        /* ── Empty state ── */
+        /* ── View detail hint ── */
+        .view-hint {
+            font-size: 10px;
+            color: #5A4070;
+            letter-spacing: 0.1em;
+            text-align: right;
+            margin-top: 8px;
+        }
+
         .empty {
             text-align: center;
             color: #5A4070;
@@ -186,7 +196,6 @@
             padding: 40px 0;
         }
 
-        /* ── Hint text ── */
         .hint {
             text-align: center;
             color: #5A4070;
@@ -213,7 +222,6 @@
 </head>
 <body>
 <div class="card">
-    <!-- Navigation -->
     <nav class="nav">
         <a href="index.html">Saint of the Day</a>
         <a href="search.html" class="active">Search by Patronage</a>
@@ -222,19 +230,14 @@
     <h1>Search by Patronage</h1>
     <div class="divider">✦ &nbsp; ✦ &nbsp; ✦</div>
 
-    <!-- Search input -->
-    <div class="search-wrap">
-        <input
-            class="search-input"
-            type="text"
-            id="search-input"
-            placeholder="Search a patronage — e.g. nurses, travelers, lost things..."
-            oninput="handleSearch()"
-        >
-    </div>
+    <input
+        class="search-input"
+        type="text"
+        id="search-input"
+        placeholder="Search a patronage — e.g. nurses, travelers, lost things..."
+        oninput="handleSearch()"
+    >
     <p class="result-count" id="result-count"></p>
-
-    <!-- Results injected here -->
     <div class="results" id="results">
         <div class="hint">Type a word to find your patron saint ✦</div>
     </div>
@@ -242,259 +245,11 @@
     <div class="credit">Data compiled from Catholic tradition</div>
 </div>
 
-<script>
-    // ── Patron saints dataset ─────────────────────────────────────────────────
-    // Each entry has a name, patronages array, description, and optional image URL
-    const SAINTS = [
-        {
-            name: "St. Anthony of Padua",
-            patronages: ["lost things", "lost items", "lost people", "travelers", "the poor", "pregnant women", "barren women", "horses", "amputees"],
-            description: "Franciscan friar and Doctor of the Church, beloved for his powerful preaching and miracles. Invoked especially for finding lost items.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Murillo_-_San_Antonio_de_Padua_con_el_Ni%C3%B1o_Jes%C3%BAs_-_Museo_del_Prado.jpg/440px-Murillo_-_San_Antonio_de_Padua_con_el_Ni%C3%B1o_Jes%C3%BAs_-_Museo_del_Prado.jpg"
-        },
-        {
-            name: "St. Joseph",
-            patronages: ["workers", "fathers", "families", "carpenters", "craftsmen", "engineers", "immigrants", "dying", "unborn children", "universal church"],
-            description: "Foster father of Jesus and husband of Mary. Patron of workers and the universal Church, known for his silent strength and faithful obedience.",
-            image: ""
-        },
-        {
-            name: "St. Thomas Aquinas",
-            patronages: ["students", "scholars", "universities", "philosophers", "theologians", "academics", "schools", "booksellers", "chastity"],
-            description: "Dominican friar and Doctor of the Church, one of the greatest theologians in history. His Summa Theologiae remains a cornerstone of Catholic thought.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/St-thomas-aquinas.jpg/440px-St-thomas-aquinas.jpg"
-        },
-        {
-            name: "St. Luke the Evangelist",
-            patronages: ["doctors", "physicians", "surgeons", "artists", "painters", "nurses", "notaries", "butchers", "glassworkers"],
-            description: "Physician and evangelist who wrote the Gospel of Luke and Acts of the Apostles. Patron of doctors and artists for his healing ministry and detailed writing.",
-            image: ""
-        },
-        {
-            name: "St. Cecilia",
-            patronages: ["musicians", "music", "singers", "poets", "composers", "organ makers"],
-            description: "Roman martyr who sang in her heart to God during her wedding. Patron of music and musicians since the 16th century.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Raphael_-_St_Cecilia_with_Sts_Paul%2C_John_the_Evangelist%2C_Augustine_and_Mary_Magdalene_-_WGA18944.jpg/440px-Raphael_-_St_Cecilia_with_Sts_Paul%2C_John_the_Evangelist%2C_Augustine_and_Mary_Magdalene_-_WGA18944.jpg"
-        },
-        {
-            name: "St. Francis of Assisi",
-            patronages: ["animals", "environment", "ecology", "nature", "birds", "merchants", "Italy", "peace"],
-            description: "Founder of the Franciscan Order, known for his radical poverty, love of creation, and mystical union with Christ. Patron of animals and ecology.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Cimabue_-_St_Francis_of_Assisi_-_WGA04910.jpg/440px-Cimabue_-_St_Francis_of_Assisi_-_WGA04910.jpg"
-        },
-        {
-            name: "St. Christopher",
-            patronages: ["travelers", "motorists", "drivers", "sailors", "surfers", "athletes", "transportation"],
-            description: "Martyr who according to legend carried the Christ child across a river. Long venerated as protector of travelers and those in danger.",
-            image: ""
-        },
-        {
-            name: "St. Jude Thaddeus",
-            patronages: ["hopeless causes", "desperate situations", "lost causes", "hospitals", "impossible cases"],
-            description: "One of the twelve apostles, invoked when all other hope is gone. The patron of hopeless and desperate cases.",
-            image: ""
-        },
-        {
-            name: "St. Michael the Archangel",
-            patronages: ["soldiers", "police officers", "military", "paramedics", "EMTs", "first responders", "grocers", "mariners", "Germany"],
-            description: "Leader of the heavenly army and protector against evil. Invoked by soldiers, police, and all who fight against darkness.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Guido_Reni_031.jpg/440px-Guido_Reni_031.jpg"
-        },
-        {
-            name: "St. Gabriel the Archangel",
-            patronages: ["messengers", "communications", "postal workers", "radio workers", "television", "telecommunications", "diplomats"],
-            description: "The archangel who announced the Incarnation to Mary. Patron of all who work in communications and messaging.",
-            image: ""
-        },
-        {
-            name: "St. Raphael the Archangel",
-            patronages: ["healing", "healers", "doctors", "travelers", "blind", "the sick", "pharmacists", "lovers"],
-            description: "The healing archangel who accompanied Tobias on his journey. Patron of the sick, healers, and travelers.",
-            image: ""
-        },
-        {
-            name: "St. Teresa of Ávila",
-            patronages: ["Spain", "headache sufferers", "chess players", "lacemakers", "people in need of grace"],
-            description: "Carmelite mystic, reformer, and Doctor of the Church. Her Interior Castle remains one of the great works of Christian mysticism.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Santa_teresa_de_jesus.jpg/440px-Santa_teresa_de_jesus.jpg"
-        },
-        {
-            name: "St. Thérèse of Lisieux",
-            patronages: ["missions", "missionaries", "florists", "France", "HIV/AIDS sufferers", "aviators", "tuberculosis sufferers"],
-            description: "The Little Flower, a Carmelite nun who died at 24. Her Little Way of spiritual childhood became one of the most beloved spiritualities of modern times.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Therese_von_Lisieux.jpg/440px-Therese_von_Lisieux.jpg"
-        },
-        {
-            name: "St. Isidore the Farmer",
-            patronages: ["farmers", "agriculture", "rural communities", "farm workers", "laborers"],
-            description: "Spanish farmer who worked the land with great piety, attending daily Mass before his work. Patron of farmers and rural communities.",
-            image: ""
-        },
-        {
-            name: "St. Dymphna",
-            patronages: ["mental illness", "mental health", "anxiety", "depression", "epilepsy", "sleepwalkers", "nervous disorders", "abuse victims"],
-            description: "Irish princess martyred by her own father, she is the patron of those with mental illness, anxiety, and nervous disorders.",
-            image: ""
-        },
-        {
-            name: "St. Peregrine Laziosi",
-            patronages: ["cancer", "cancer patients", "illness", "sick people"],
-            description: "Servite friar who was miraculously cured of cancer of the foot. Widely invoked by those suffering from cancer and other serious illnesses.",
-            image: ""
-        },
-        {
-            name: "St. Blaise",
-            patronages: ["throat ailments", "sore throats", "animals", "wool combers", "wind", "wild animals"],
-            description: "Bishop and martyr known for miraculously curing a boy choking on a fish bone. Patron of those with throat ailments.",
-            image: ""
-        },
-        {
-            name: "St. Valentine",
-            patronages: ["love", "lovers", "couples", "engaged couples", "beekeepers", "epilepsy", "plague"],
-            description: "Roman priest and martyr associated with courtly love since the Middle Ages. Patron of lovers and those with epilepsy.",
-            image: ""
-        },
-        {
-            name: "St. Patrick",
-            patronages: ["Ireland", "Irish people", "engineers", "snakes", "paralegals"],
-            description: "Apostle of Ireland who used the shamrock to explain the Trinity. Patron of Ireland and one of the most beloved saints in history.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/StPatrickDriving.jpg/440px-StPatrickDriving.jpg"
-        },
-        {
-            name: "St. Nicholas",
-            patronages: ["children", "sailors", "merchants", "brewers", "pawnbrokers", "prisoners", "repentant thieves", "Russia"],
-            description: "Bishop of Myra known for secret gift-giving and miracles. The basis for the Santa Claus tradition and patron of children.",
-            image: ""
-        },
-        {
-            name: "St. Joan of Arc",
-            patronages: ["France", "soldiers", "military", "women in military", "prisoners", "martyrs", "captives"],
-            description: "The Maid of Orléans, a peasant girl who led France to victory under divine inspiration. Burned at the stake at 19, later declared a saint.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Joan_of_Arc_on_horseback.jpg/440px-Joan_of_Arc_on_horseback.jpg"
-        },
-        {
-            name: "St. Mary Magdalene",
-            patronages: ["women", "contemplatives", "repentant sinners", "hairdressers", "perfumers", "pharmacists", "glove makers"],
-            description: "The first witness of the Resurrection, called Apostle to the Apostles. Patron of contemplatives and those seeking forgiveness.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Titian_-_Penitent_Magdalene_%28c.1567%29.jpg/440px-Titian_-_Penitent_Magdalene_%28c.1567%29.jpg"
-        },
-        {
-            name: "St. Peter the Apostle",
-            patronages: ["fishermen", "fishing", "net makers", "ship builders", "locksmiths", "cobblers", "popes", "Rome"],
-            description: "First among the apostles and first Bishop of Rome. Called from his fishing nets by Christ, he became the rock upon which the Church was built.",
-            image: ""
-        },
-        {
-            name: "St. Paul the Apostle",
-            patronages: ["writers", "journalists", "publishers", "authors", "evangelists", "missionaries", "tentmakers", "press"],
-            description: "Apostle to the Gentiles whose letters form much of the New Testament. His dramatic conversion on the road to Damascus is one of history's great stories.",
-            image: ""
-        },
-        {
-            name: "St. Augustine of Hippo",
-            patronages: ["theologians", "scholars", "printers", "brewers", "sore eyes", "Algeria"],
-            description: "Bishop, theologian, and Doctor of the Church. His Confessions is one of the most influential spiritual autobiographies ever written.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Sandro_Botticelli_-_St_Augustine_in_his_Cell_-_WGA2898.jpg/440px-Sandro_Botticelli_-_St_Augustine_in_his_Cell_-_WGA2898.jpg"
-        },
-        {
-            name: "St. Kateri Tekakwitha",
-            patronages: ["environment", "ecology", "Native Americans", "Indigenous peoples", "exiles"],
-            description: "The first Native American to be canonized, known as the Lily of the Mohawks. She suffered greatly for her faith and devotion to Christ.",
-            image: ""
-        },
-        {
-            name: "St. John Bosco",
-            patronages: ["youth", "young people", "children", "editors", "publishers", "students", "apprentices"],
-            description: "Founder of the Salesians, dedicated his life to educating poor and at-risk youth in Turin. His preventive system of education influenced the world.",
-            image: ""
-        },
-        {
-            name: "St. Padre Pio",
-            patronages: ["stress relief", "January blues", "civil defense volunteers", "adolescents"],
-            description: "Italian Capuchin friar who bore the stigmata for 50 years. Known for his mystical gifts, healing, and hours spent in the confessional.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Padre_Pio_3.jpg/440px-Padre_Pio_3.jpg"
-        },
-        {
-            name: "St. Maximilian Kolbe",
-            patronages: ["journalists", "prisoners", "families", "drug addicts", "political prisoners", "pro-life movement"],
-            description: "Polish Franciscan priest who voluntarily gave his life in Auschwitz to save another prisoner. Patron of journalists and prisoners.",
-            image: ""
-        },
-        {
-            name: "St. Gianna Beretta Molla",
-            patronages: ["mothers", "physicians", "unborn children", "families", "pro-life movement"],
-            description: "Italian physician and mother who chose to continue her pregnancy despite a serious uterine condition, sacrificing her life for her child.",
-            image: ""
-        },
-        {
-            name: "St. Scholastica",
-            patronages: ["nuns", "education", "convulsive children", "rain", "schools"],
-            description: "Twin sister of St. Benedict and founder of female Benedictine monasticism. Known for her deep prayer life and love of learning.",
-            image: ""
-        },
-        {
-            name: "St. Benedict of Nursia",
-            patronages: ["monks", "Europe", "students", "farmers", "engineers", "architects", "poison sufferers", "temptations"],
-            description: "Father of Western monasticism whose Rule shaped European civilization. Patron of Europe and all who live in community.",
-            image: ""
-        },
-        {
-            name: "St. Dominic",
-            patronages: ["astronomers", "scientists", "Dominican Republic", "preachers"],
-            description: "Founder of the Order of Preachers, known for his intellectual rigor and devotion to the Rosary. He met heresy with love and truth.",
-            image: ""
-        },
-        {
-            name: "St. Ignatius of Loyola",
-            patronages: ["soldiers", "Jesuits", "spiritual retreats", "educators", "Spain"],
-            description: "Founder of the Society of Jesus. His Spiritual Exercises remain one of the most widely used tools for discernment and prayer.",
-            image: ""
-        },
-        {
-            name: "St. Francis Xavier",
-            patronages: ["missionaries", "missions", "navigators", "Japan", "India", "Australia"],
-            description: "Co-founder of the Jesuits who brought Christianity to India, Japan, and Southeast Asia. One of the greatest missionaries in history.",
-            image: ""
-        },
-        {
-            name: "St. Elizabeth Ann Seton",
-            patronages: ["Catholic schools", "education", "teachers", "widows", "United States"],
-            description: "First American-born saint and founder of the first free Catholic school in the United States. Patron of Catholic schools.",
-            image: ""
-        },
-        {
-            name: "St. John Vianney",
-            patronages: ["priests", "parish priests", "confessors"],
-            description: "The Curé of Ars, known for spending up to 18 hours a day in the confessional. His holiness transformed an entire village and drew thousands.",
-            image: ""
-        },
-        {
-            name: "St. Catherine of Siena",
-            patronages: ["Italy", "nurses", "fire prevention", "sick people", "Europe", "against miscarriages"],
-            description: "Dominican tertiary, mystic, and Doctor of the Church who persuaded the Pope to return to Rome. Known for her mystical experiences and political courage.",
-            image: ""
-        },
-        {
-            name: "St. Rita of Cascia",
-            patronages: ["impossible causes", "desperate situations", "widows", "abuse victims", "wounds", "loneliness"],
-            description: "Augustinian nun known as the Patron of Impossible Causes. She bore the wound of the Crown of Thorns after praying to share in Christ's suffering.",
-            image: ""
-        },
-        {
-            name: "St. Isidore of Seville",
-            patronages: ["internet", "computers", "technology", "programmers", "students", "scholars"],
-            description: "Archbishop of Seville and Doctor of the Church who compiled one of the first encyclopedias. Proposed as patron of the internet for his work organizing knowledge.",
-            image: ""
-        },
-        {
-            name: "Our Lady of Guadalupe",
-            patronages: ["Americas", "Mexico", "unborn children", "immigrants", "Latin America", "pro-life"],
-            description: "The image of Mary miraculously imprinted on the tilma of St. Juan Diego in 1531. Patroness of the Americas and a symbol of hope.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Guadalupe1.jpg/440px-Guadalupe1.jpg"
-        }
-    ];
+<!-- Load shared saints dataset -->
+<script src="saints-data.js"></script>
 
-    // ── Search handler ────────────────────────────────────────────────────────
+<script>
+    // Handle search input and render matching saints
     function handleSearch() {
         const query = document.getElementById('search-input').value.trim().toLowerCase();
         const resultsEl = document.getElementById('results');
@@ -508,36 +263,32 @@
         }
 
         // Filter saints whose patronages include the query
-        const matches = SAINTS.filter(s =>
+        const matches = SAINTS_DATA.filter(s =>
             s.patronages.some(p => p.toLowerCase().includes(query))
         );
 
-        // Update result count
         countEl.textContent = matches.length > 0
             ? `${matches.length} saint${matches.length > 1 ? 's' : ''} found`
             : '';
 
-        // No results
         if (matches.length === 0) {
             resultsEl.innerHTML = `<div class="empty">No patron saint found for "${query}" :( Try a different word.</div>`;
             return;
         }
 
-        // Build result cards
+        // Build clickable result cards linking to saint detail page
         resultsEl.innerHTML = matches.map(saint => {
-            // Image or cross placeholder
             const imgHTML = saint.image
                 ? `<img class="result-img" src="${saint.image}" alt="${saint.name}" onerror="this.outerHTML='<div class=\\'result-cross\\'>✝</div>'">`
                 : `<div class="result-cross">✝</div>`;
 
-            // Highlight matched tags
             const tagsHTML = saint.patronages.map(p => {
                 const isMatch = p.toLowerCase().includes(query);
                 return `<span class="tag ${isMatch ? 'match' : ''}">${p}</span>`;
             }).join('');
 
             return `
-                <div class="result-card">
+                <a class="result-card" href="saint.html?id=${saint.id}">
                     <div class="result-header">
                         ${imgHTML}
                         <div class="result-info">
@@ -546,7 +297,8 @@
                         </div>
                     </div>
                     <div class="result-desc">${saint.description}</div>
-                </div>`;
+                    <div class="view-hint">View saint →</div>
+                </a>`;
         }).join('');
     }
 </script>
